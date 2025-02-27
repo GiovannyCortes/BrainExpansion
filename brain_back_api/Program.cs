@@ -3,10 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-using brain_back_application;
-using brain_back_infrastructure;
 using brain_back_application.Helpers;
 using brain_back_domain.Enumerations;
+using brain_back_application.Interfaces;
+using brain_back_application.Services;
+
+using brain_back_infrastructure.Data;
+using brain_back_infrastructure.Interfaces;
 
 try
 {
@@ -31,17 +34,36 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add services to the container.
-Dictionary<EDBSelected, string> cnStrings = new Dictionary<EDBSelected, string> {
-    { EDBSelected.SqlServer, builder.Configuration.GetConnectionString("SqlServer")! },
-    { EDBSelected.PostGress, builder.Configuration.GetConnectionString("PostGress")! }
-};
+    // Add services to the container.
 
-// Configurar servicios de infraestructura (repositorios y DbContext)
-builder.Services.AddInfrastructureServices(cnStrings, EDBSelected.PostGress);
+    EDBSelected dbSelected = EDBSelected.PostGress;
 
-// Configurar servicios de la capa aplicaci�n (servicios de negocio)
-builder.Services.AddApplicationServices();
+    Dictionary<EDBSelected, string> cnStrings = new Dictionary<EDBSelected, string> {
+        { EDBSelected.SqlServer, builder.Configuration.GetConnectionString("SqlServer")! },
+        { EDBSelected.PostGress, builder.Configuration.GetConnectionString("PostGress")! }
+    };
+
+    switch (dbSelected)
+    {
+        case EDBSelected.SqlServer:
+            builder.Services.AddDbContext<BrainContext>(options => options.UseSqlServer(cnStrings[EDBSelected.SqlServer])); // SQL Server
+
+            // Registrar repositorios
+            builder.Services.AddTransient<IUserRepository, brain_back_infrastructure.Repositories_SqlServer.UserRepository>();
+            builder.Services.AddTransient<IQuestionRepository, brain_back_infrastructure.Repositories_SqlServer.QuestionRepository>();
+            break;
+        case EDBSelected.PostGress:
+            builder.Services.AddDbContext<BrainContext>(options => options.UseNpgsql(cnStrings[EDBSelected.PostGress])); // PostgreSQL
+
+            // Registrar repositorios
+            builder.Services.AddTransient<IUserRepository, brain_back_infrastructure.Repositories_PostGress.UserRepository>();
+            builder.Services.AddTransient<IQuestionRepository, brain_back_infrastructure.Repositories_PostGress.QuestionRepository>();
+            break;
+    }
+
+    builder.Services.AddTransient<IUserService, UserService>();
+    builder.Services.AddTransient<IQuestionService, QuestionService>();
+
 
 builder.Services.AddControllersWithViews();
 
