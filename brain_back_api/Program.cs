@@ -134,6 +134,8 @@ try
     Line = 20;
     app.UseCors("AllowOrigin");
 
+    app.Urls.Add("http://0.0.0.0:8080");
+
     Line = 21;
     app.MapControllers();
 
