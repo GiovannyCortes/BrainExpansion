@@ -8,6 +8,8 @@ using brain_back_infrastructure;
 using brain_back_application.Helpers;
 using brain_back_domain.Enumerations;
 
+try
+{
 var builder = WebApplication.CreateBuilder(args);
 
 // Security
@@ -63,8 +65,6 @@ builder.Services.AddSwaggerGen(options => {
 
 var app = builder.Build();
 
-try
-{
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
@@ -86,9 +86,6 @@ try
 }
 catch (Exception ex)
 {
-    var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "La aplicación falló al iniciar.");
-
     Console.WriteLine($"Error crítico: {ex.Message}");
     if (ex.InnerException != null)
     {
