@@ -63,21 +63,35 @@ builder.Services.AddSwaggerGen(options => {
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
-    app.UseSwagger();
-    app.UseSwaggerUI(options => {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API OAuth Brain-G");
-        options.RoutePrefix = "";
-    });
+try
+{
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "API OAuth Brain-G");
+            options.RoutePrefix = "";
+        });
+    }
+
+    app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseCors("AllowOrigin");
+    app.MapControllers();
+
+    app.Run();
 }
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "La aplicación falló al iniciar.");
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.UseCors("AllowOrigin");
-
-app.MapControllers();
-
-app.Run();
+    Console.WriteLine($"Error crítico: {ex.Message}");
+    if (ex.InnerException != null)
+    {
+        Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+    }
+}
