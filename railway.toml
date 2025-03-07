@@ -1,13 +1,9 @@
 [build]
 builder = "nixpacks"
-buildCommand = "echo building! GiovannyRailWay2"
-
-[deploy]
-numReplicas = 1
-healthcheckPath = "/health"
-restartPolicy = "always"
+buildCommand = "echo building! GiovannyRailWay"
 
 [env]
 DOTNET_VERSION = "8.0"
 ASPNETCORE_ENVIRONMENT = "Production"
 PORT = "8080"
+
