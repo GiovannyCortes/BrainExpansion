@@ -1,0 +1,5 @@
+nixPkgs = ["dotnet-sdk_8"]
+[phases.build]
+cmds = ["dotnet publish -c Release -o out"]
+[start]
+cmd = "dotnet out/brain_back_api.dll"
