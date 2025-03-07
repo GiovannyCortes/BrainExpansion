@@ -109,37 +109,33 @@ try
 
     // Configure the HTTP request pipeline.
     Line = 14;
-    if (app.Environment.IsDevelopment())
+    app.UseSwagger();
+
+    Line = 15;
+    app.UseSwaggerUI(options =>
     {
-        Line = 15;
-        app.UseSwagger();
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "API OAuth Brain-G");
+        options.RoutePrefix = "";
+    });
 
-        Line = 16;
-        app.UseSwaggerUI(options =>
-        {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "API OAuth Brain-G");
-            options.RoutePrefix = "";
-        });
-    }
-
-    Line = 17;
+    Line = 16;
     app.UseHttpsRedirection();
 
-    Line = 18;
+    Line = 17;
     app.UseAuthentication();
 
-    Line = 19;
+    Line = 18;
     app.UseAuthorization();
 
-    Line = 20;
+    Line = 19;
     app.UseCors("AllowOrigin");
 
     app.Urls.Add("http://0.0.0.0:8080");
 
-    Line = 21;
+    Line = 20;
     app.MapControllers();
 
-    Line = 22;
+    Line = 21;
     app.Run();
 }
 catch (Exception ex)
